@@ -410,6 +410,14 @@ export function ASMessageBubble({ message }: MessageBubbleProps) {
 
 	const blocks = groupToolCalls(message.content);
 
+	// A fatal error terminated this reply. ``finished_reason`` / ``error`` are
+	// reply-level fields set by ``appendEvent`` on a ``REPLY_END`` with
+	// ``finished_reason === ReplyFinishedReason.ERROR`` — they are NOT content
+	// blocks, so the body above is always genuine agent output. Rendered as a
+	// separate alert below the body.
+	const errorInfo = message.error;
+	const isError = message.finished_reason === ReplyFinishedReason.ERROR || !!errorInfo;
+
 	const startMs = new Date(message.created_at).getTime();
 	const endMs = isRunning ? now : new Date(message.finished_at!).getTime();
 	const elapsedSeconds = Math.max(0, (endMs - startMs) / 1000);
@@ -427,7 +435,7 @@ export function ASMessageBubble({ message }: MessageBubbleProps) {
 							</BubbleContent>
 						</Bubble>
 					))}
-				{message.finished_reason === ReplyFinishedReason.ERROR && (
+				{isError && (
 					<Alert
 						variant="destructive"
 						className="m-2 w-[calc(100%-1rem)] border-red-200 bg-red-50 text-destructive dark:border-red-900 dark:bg-red-950 dark:text-red-50"
@@ -435,9 +443,9 @@ export function ASMessageBubble({ message }: MessageBubbleProps) {
 						<TriangleAlert />
 						<AlertTitle>{t('messageBubble.error.title')}</AlertTitle>
 						<AlertDescription>
-							{t(`messageBubble.error.${message.error?.type ?? 'unknown'}`, {
+							{t(`messageBubble.error.${errorInfo?.type ?? 'unknown'}`, {
 								defaultValue:
-									message.error?.message ?? t('messageBubble.error.unknown'),
+									errorInfo?.message ?? t('messageBubble.error.unknown'),
 							})}
 						</AlertDescription>
 					</Alert>

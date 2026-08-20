@@ -1,12 +1,10 @@
-import { ReplyFinishedReason } from '@agentscope-ai/agentscope/event';
 import {
 	type ContentBlock,
 	getContentBlocks,
 	type Msg,
-	type TextBlock,
 	type ToolCallBlock,
 } from '@agentscope-ai/agentscope/message';
-import { GitBranch, TriangleAlert } from 'lucide-react';
+import { GitBranch } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '../ui/button';
@@ -17,7 +15,6 @@ import { ConfirmCard } from '@/components/chat/ConfirmCard.tsx';
 import { FlipCard } from '@/components/chat/FlipCard.tsx';
 import { TextInput } from '@/components/chat/TextInput.tsx';
 import { WorkingDirectoryDialog } from '@/components/dialog/WorkingDirectoryDialog';
-import { Alert, AlertAction, AlertDescription, AlertTitle } from '@/components/ui/alert.tsx';
 import {
 	MessageScroller,
 	MessageScrollerButton,
@@ -167,45 +164,6 @@ const ChatContentComponent: React.FC<ChatContentProps> = ({
 										/>
 									</MessageScrollerItem>
 								))}
-								{msgs.length > 0 &&
-									msgs[msgs.length - 1].finished_reason ===
-										ReplyFinishedReason.EXCEED_MAX_ITERS &&
-									phase === 'idle' && (
-										<Alert
-											variant={'default'}
-											className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-50"
-										>
-											<TriangleAlert />
-											<AlertTitle>
-												{t('chat.maxItersExceeded.title')}
-											</AlertTitle>
-											<AlertDescription>
-												{t('chat.maxItersExceeded.description')}
-											</AlertDescription>
-											<AlertAction>
-												<Button
-													size={'xs'}
-													onClick={() => {
-														onSend([
-															{
-																id: crypto.randomUUID(),
-																type: 'text',
-																text: t(
-																	'chat.maxItersExceeded.continue',
-																),
-																created_at:
-																	new Date().toISOString(),
-																finished_at:
-																	new Date().toISOString(),
-															} as TextBlock,
-														]);
-													}}
-												>
-													{t('chat.maxItersExceeded.continue')}
-												</Button>
-											</AlertAction>
-										</Alert>
-									)}
 							</MessageScrollerContent>
 						</MessageScrollerViewport>
 						<MessageScrollerButton className="rounded-full" />
